@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  php-apache-environment:
+    image: yurischa/kuis2
+    container_name: php-apache
+    depends_on:
+      - db
+    volumes:
+      - ./php/src:/var/www/html/
+    ports:
+      - "8000:80"
+    networks:
+      - backend
+
+  db:
+    container_name: db
+    image: mysql
+    restart: always
+    environments:
+      MYSQL_ROOT_PASSWORD:
+      MYSQL_DATABASE: dbpus
+    ports:
+      - "3306:3306"
+    volumes:
+      - db:/var/lib/mysql
+      - ./dbpus.sql:/docker-entrypoint-initdb.d/dbpus.sql
+    networks:
+      - backend
+volumes:
+  db:
+
+networks:
+  backend:
+    name: backend-network
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/24
